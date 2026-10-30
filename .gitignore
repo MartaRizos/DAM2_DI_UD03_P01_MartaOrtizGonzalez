@@ -3,6 +3,19 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Directorios de compilación
+[Bb]in/
+[Oo]bj/
+
+# Archivos temporales de Visual Studio
+.vs/
+*.user
+*.suo
+
+# Archivos temporales
+*.tmp
+*.log
+
 # User-specific files
 *.rsuser
 *.suo
