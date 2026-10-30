@@ -1,0 +1,474 @@
+﻿ <Window x:Class="DAM2_DI_UD03_P01_MartaOrtizGonzalez.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TaskFlow DAM"
+        Width="850"
+        Height="650"
+        MinWidth="650"
+        MinHeight="500"
+        MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7FA"
+        Foreground="#172B3A"
+        FontFamily="Segoe UI"
+        FontSize="14">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+
+    <DockPanel LastChildFill="True">
+
+        <!-- Barra de estado inferior -->
+        <StatusBar DockPanel.Dock="Bottom"
+                   Background="#FFFFFF"
+                   Foreground="#172B3A"
+                   Padding="12"
+                   BorderBrush="#526579"
+                   BorderThickness="0,1,0,0">
+
+            <StatusBarItem>
+                <TextBlock Text="{Binding EstadoApp, Mode=OneWay}"
+                           AutomationProperties.Name="Estado de la aplicación"/>
+            </StatusBarItem>
+
+            <Separator/>
+
+            <StatusBarItem>
+                <TextBlock AutomationProperties.Name="Número de tareas pendientes">
+                    <Run Text="Pendientes: "/>
+                    <Run Text="{Binding TareasPendientesCount, Mode=OneWay}"/>
+                </TextBlock>
+            </StatusBarItem>
+
+        </StatusBar>
+
+        <!-- Contenido principal desplazable -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      CanContentScroll="False"
+                      PanningMode="VerticalOnly">
+
+            <Grid Margin="24">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Cabecera -->
+                <Border Grid.Row="0"
+                        Background="#17324D"
+                        CornerRadius="10"
+                        Padding="22"
+                        Margin="0,0,0,20">
+
+                    <StackPanel>
+                        <TextBlock Text="TaskFlow DAM"
+                                   FontSize="27"
+                                   FontWeight="Bold"
+                                   Foreground="#FFFFFF"/>
+
+                        <TextBlock Text="Organiza tus tareas y alcanza tus objetivos"
+                                   FontSize="14"
+                                   Foreground="#FFFFFF"
+                                   Margin="0,6,0,0"/>
+                    </StackPanel>
+
+                </Border>
+
+                <!-- Formulario de nueva tarea -->
+                <Border Grid.Row="1"
+                        Background="#FFFFFF"
+                        CornerRadius="10"
+                        Padding="20"
+                        Margin="0,0,0,20"
+                        BorderBrush="#526579"
+                        BorderThickness="1">
+
+                    <StackPanel>
+
+                        <TextBlock Text="+ Nueva tarea"
+                                   FontSize="19"
+                                   FontWeight="Bold"
+                                   Foreground="#172B3A"
+                                   Margin="0,0,0,18"/>
+
+                        <!-- Título -->
+                        <Label Content="_Título de la tarea:"
+                               Target="{Binding ElementName=TxtTitulo}"
+                               Foreground="#172B3A"
+                               Padding="0"
+                               Margin="0,0,0,6"/>
+
+                        <TextBox x:Name="TxtTitulo"
+                                 Text="{Binding NuevoTitulo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 MinHeight="44"
+                                 Padding="10"
+                                 Margin="0,0,0,18"
+                                 Foreground="#172B3A"
+                                 Background="#FFFFFF"
+                                 BorderBrush="#526579"
+                                 BorderThickness="1"
+                                 AutomationProperties.Name="Título de la tarea"
+                                 AutomationProperties.HelpText="Escribe un título para la nueva tarea"
+                                 TabIndex="0"/>
+
+                        <!-- Módulo y fecha límite -->
+                        <Grid Margin="0,0,0,18">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+
+                                <Label Content="_Módulo:"
+                                       Target="{Binding ElementName=CmbModulo}"
+                                       Foreground="#172B3A"
+                                       Padding="0"
+                                       Margin="0,0,0,6"/>
+
+                                <ComboBox x:Name="CmbModulo"
+                                          ItemsSource="{Binding Modulos}"
+                                          SelectedItem="{Binding NuevoModulo, Mode=TwoWay}"
+                                          MinHeight="44"
+                                          Padding="8"
+                                          Foreground="#172B3A"
+                                          Background="#FFFFFF"
+                                          BorderBrush="#526579"
+                                          AutomationProperties.Name="Módulo"
+                                          AutomationProperties.HelpText="Selecciona el módulo de DAM"
+                                          TabIndex="1"/>
+
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+
+                                <Label Content="_Fecha límite:"
+                                       Target="{Binding ElementName=DpFechaLimite}"
+                                       Foreground="#172B3A"
+                                       Padding="0"
+                                       Margin="0,0,0,6"/>
+
+                                <DatePicker x:Name="DpFechaLimite"
+                                            SelectedDate="{Binding NuevaFechaLimite, Mode=TwoWay}"
+                                            MinHeight="44"
+                                            Foreground="#172B3A"
+                                            Background="#FFFFFF"
+                                            AutomationProperties.Name="Fecha límite"
+                                            AutomationProperties.HelpText="Selecciona la fecha límite de la tarea"
+                                            TabIndex="2"/>
+
+                            </StackPanel>
+
+                        </Grid>
+
+                        <!-- Prioridad -->
+                        <GroupBox Header="Prioridad:" 
+                                  Foreground="#172B3A" 
+                                  FontWeight="SemiBold"
+                                  BorderBrush="Transparent" 
+                                  BorderThickness="0" 
+                                  Padding="0" 
+                                  Margin="0,0,0,18">
+
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,6,0,0">
+
+                                <RadioButton x:Name="RbPrioridadBaja"
+                                             Content="_Baja"
+                                             GroupName="GrpPrioridad"
+                                             Tag="Baja"
+                                             IsChecked="False"
+                                             Checked="Prioridad_Checked"
+                                             Foreground="#172B3A"
+                                             Margin="0,0,24,0"
+                                             Padding="8"
+                                             MinHeight="44"
+                                             AutomationProperties.Name="Prioridad baja"
+                                             AutomationProperties.HelpText="Establece una prioridad baja"
+                                             TabIndex="3"/> 
+
+                                <RadioButton x:Name="RbPrioridadMedia"
+                                             Content="_Media"
+                                             GroupName="GrpPrioridad"
+                                             Tag="Media"
+                                             IsChecked="True"
+                                             Checked="Prioridad_Checked"
+                                             Foreground="#172B3A"
+                                             Margin="0,0,24,0"
+                                             Padding="8"
+                                             MinHeight="44"
+                                             AutomationProperties.Name="Prioridad media"
+                                             AutomationProperties.HelpText="Establece una prioridad media"
+                                             TabIndex="4"/>
+
+                                <RadioButton x:Name="RbPrioridadAlta"
+                                             Content="_Alta"
+                                             GroupName="GrpPrioridad"
+                                             Tag="Alta"
+                                             IsChecked="False"
+                                             Checked="Prioridad_Checked"
+                                             Foreground="#172B3A"
+                                             Padding="8"
+                                             MinHeight="44"
+                                             AutomationProperties.Name="Prioridad alta"
+                                             AutomationProperties.HelpText="Establece una prioridad alta"
+                                             TabIndex="5"/>
+
+                            </StackPanel>
+
+                        </GroupBox>
+
+                        <!-- Urgencia -->
+                        <!-- Urgencia -->
+
+                        <CheckBox x:Name="ChkUrgente" 
+                                  Content="_Marcar como urgente" 
+                                  IsChecked="{Binding NuevaTareaUrgente, Mode=TwoWay}" 
+                                  Foreground="#172B3A" 
+                                  Margin="0,0,0,20" 
+                                  Padding="8" 
+                                  MinHeight="44" 
+                                  AutomationProperties.Name="Marcar como urgente" 
+                                  AutomationProperties.HelpText="Indica si la tarea requiere atención prioritaria" 
+                                  TabIndex="6"/>
+
+                        <!-- Botones del formulario -->
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+
+                            <Button Content="_Añadir tarea"
+                                    IsEnabled="{Binding PuedeAgregarTarea, Mode=OneWay}"
+                                    Click="BtnAgregar_Click"
+                                    IsDefault="True"
+                                    MinWidth="145"
+                                    MinHeight="46"
+                                    Padding="18,10"
+                                    Margin="0,0,12,0"
+                                    AutomationProperties.Name="Añadir tarea"
+                                    AutomationProperties.HelpText="Añade la tarea a la lista si has escrito un título. Puedes pulsar Enter para confirmar."
+                                    TabIndex="7">
+
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="Background" Value="#17324D"/>
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        <Setter Property="BorderBrush" Value="#17324D"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Background" Value="#E2E8F0"/>
+                                                <Setter Property="Foreground" Value="#263746"/>
+                                                <Setter Property="BorderBrush" Value="#526579"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+
+                            </Button>
+
+                            <Button Content="_Limpiar"
+                                    Click="BtnLimpiar_Click"
+                                    IsCancel="True"
+                                    MinWidth="115"
+                                    MinHeight="46"
+                                    Padding="18,10"
+                                    Background="#FFFFFF"
+                                    Foreground="#172B3A"
+                                    BorderBrush="#526579"
+                                    BorderThickness="1"
+                                    AutomationProperties.Name="Limpiar formulario"
+                                    AutomationProperties.HelpText="Borra los campos sin eliminar las tareas existentes"
+                                    TabIndex="8"/>
+
+                        </StackPanel>
+
+                    </StackPanel>
+
+                </Border>
+
+                <!-- Resumen del progreso -->
+                <Border Grid.Row="2"
+                        Background="#FFFFFF"
+                        CornerRadius="10"
+                        Padding="20"
+                        Margin="0,0,0,20"
+                        BorderBrush="#526579"
+                        BorderThickness="1">
+
+                    <StackPanel>
+
+                        <TextBlock Text="Progreso de tus tareas"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#172B3A"
+                                   Margin="0,0,0,12"/>
+
+                        <ProgressBar Minimum="0"
+                                     Maximum="100"
+                                     Value="{Binding ProgresoPorcentaje, Mode=OneWay}"
+                                     Height="18"
+                                     AutomationProperties.Name="Progreso de tareas"
+                                     AutomationProperties.HelpText="Porcentaje de tareas completadas"/>
+
+                        <TextBlock Text="{Binding TextoProgreso, Mode=OneWay}"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,10,0,0"
+                                   Foreground="#172B3A"/>
+
+                    </StackPanel>
+
+                </Border>
+
+                <!-- Lista de tareas -->
+                <Border Grid.Row="3"
+                        Background="#FFFFFF"
+                        CornerRadius="10"
+                        Padding="20"
+                        BorderBrush="#526579"
+                        BorderThickness="1">
+
+                    <DockPanel LastChildFill="True">
+
+                        <TextBlock DockPanel.Dock="Top"
+                                   Text="Mis tareas"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#172B3A"
+                                   Margin="0,0,0,14"/>
+
+                        <ListBox ItemsSource="{Binding Tareas}"
+                                 BorderThickness="0"
+                                 Background="#FFFFFF"
+                                 Foreground="#172B3A"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 PreviewMouseWheel="ListaTareas_PreviewMouseWheel"
+                                 KeyboardNavigation.TabNavigation="Continue"
+                                 KeyboardNavigation.DirectionalNavigation="Continue"
+                                 AutomationProperties.Name="Lista de tareas"
+                                 AutomationProperties.HelpText="Lista de tareas. Usa Tab para recorrer sus controles interactivos.">
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Border BorderBrush="#526579"
+                                            BorderThickness="0,0,0,1"
+                                            Padding="10"
+                                            Margin="0,0,0,6">
+
+                                        <Grid>
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0">
+
+                                                <CheckBox IsChecked="{Binding Completada, Mode=TwoWay}"
+                                                          Foreground="#172B3A"
+                                                          FontSize="14"
+                                                          AutomationProperties.Name="{Binding Titulo}"
+                                                          AutomationProperties.HelpText="Marca esta tarea como completada">
+
+                                                    <TextBlock Text="{Binding Titulo}"
+                                                               TextWrapping="Wrap"
+                                                               Foreground="#172B3A"
+                                                               FontWeight="SemiBold">
+
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="{x:Type TextBlock}">
+                                                                <Setter Property="TextDecorations" Value="{x:Null}"/>
+
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Completada}" Value="True">
+                                                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+
+                                                    </TextBlock>
+
+                                                </CheckBox>
+
+                                                <WrapPanel Margin="24,7,0,0">
+
+                                                    <TextBlock Text="{Binding Modulo}"
+                                                               Foreground="#34495E"
+                                                               FontSize="12"/>
+
+                                                    <TextBlock Text="  |  "
+                                                               Foreground="#34495E"/>
+
+                                                    <TextBlock Text="{Binding Prioridad}"
+                                                               Foreground="#34495E"
+                                                               FontSize="12"/>
+
+                                                    <Border Background="#FCE8E6"
+                                                            BorderBrush="#8B1E1E"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4"
+                                                            Padding="7,3"
+                                                            Margin="8,0,0,0"
+                                                            Visibility="{Binding EsUrgente, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                            AutomationProperties.Name="Advertencia: esta tarea es urgente">
+
+                                                        <TextBlock Text="URGENTE"
+                                                                   Foreground="#8B1E1E"
+                                                                   FontWeight="Bold"
+                                                                   FontSize="12"/>
+                                                    </Border>
+
+                                                </WrapPanel>
+
+                                                <TextBlock Text="{Binding FechaLimite, StringFormat='Fecha límite: {0:dd/MM/yyyy}'}"
+                                                           Foreground="#34495E"
+                                                           FontSize="12"
+                                                           Margin="24,5,0,0"/>
+
+                                            </StackPanel>
+
+                                            <Button Grid.Column="1"
+                                                    Content="Eliminar"
+                                                    Click="BtnEliminar_Click"
+                                                    Tag="{Binding}"
+                                                    MinWidth="80"
+                                                    MinHeight="40"
+                                                    Margin="12,0,0,0"
+                                                    Padding="8"
+                                                    Background="#FFFFFF"
+                                                    Foreground="#8B1E1E"
+                                                    BorderBrush="#8B1E1E"
+                                                    AutomationProperties.Name="{Binding Titulo, StringFormat=Eliminar tarea {0}}"
+                                                    AutomationProperties.HelpText="Elimina esta tarea de la lista de forma permanente"/>
+
+                                        </Grid>
+
+                                    </Border>
+
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                        </ListBox>
+
+                    </DockPanel>
+
+                </Border>
+
+            </Grid>
+
+        </ScrollViewer>
+
+    </DockPanel>
+
+</Window>
+
